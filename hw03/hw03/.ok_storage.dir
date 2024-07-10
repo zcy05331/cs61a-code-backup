@@ -1,0 +1,5 @@
+'num_eights-correct', (0, 66)
+'interleaved_sum-correct', (512, 66)
+'count_coins-correct', (1024, 66)
+'move_stack-correct', (1536, 66)
+'make_anonymous_factorial-correct', (2048, 66)
