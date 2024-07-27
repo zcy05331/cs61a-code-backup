@@ -96,6 +96,17 @@ def store_digits(n):
     >>> print("Do not use str or reversed!") if any([r in cleaned for r in ["str", "reversed"]]) else None
     """
     "*** YOUR CODE HERE ***"
+    res = []
+    while n > 0:
+        res.append(n % 10)
+        n = n // 10
+    for i in range(len(res)):
+        if i == 0:
+            link = Link(res[i])
+        else:
+            link = Link(res[i], link)
+    return link
+        
 
 
 def deep_map_mut(func, lnk):
@@ -118,6 +129,12 @@ def deep_map_mut(func, lnk):
     <9 <16> 25 36>
     """
     "*** YOUR CODE HERE ***"
+    if isinstance(lnk.first, Link):
+        deep_map_mut(func, lnk.first)
+    else:
+        lnk.first = func(lnk.first)
+    if lnk.rest is not Link.empty:
+        deep_map_mut(func, lnk.rest)
 
 
 def two_list(vals, counts):
@@ -139,7 +156,14 @@ def two_list(vals, counts):
     Link(1, Link(1, Link(3, Link(3, Link(2)))))
     """
     "*** YOUR CODE HERE ***"
-
+    if len(vals) == 0:
+        return Link.empty
+    else:
+        if counts[0] == 1:
+            return Link(vals[0], two_list(vals[1:], counts[1:]))
+        else:
+            counts[0] -= 1
+            return Link(vals[0], two_list(vals, counts))
 
 class Link:
     """A linked list.
