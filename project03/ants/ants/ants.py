@@ -102,6 +102,7 @@ class Ant(Insect):
     food_cost = 0
     is_container = False
     is_doubled = False
+    blocks_path = True
     # ADD CLASS ATTRIBUTES HERE
 
     def __init__(self, health=1):
@@ -470,7 +471,6 @@ class QueenAnt(ThrowerAnt):
 
 
 
-
 ############
 # Optional #
 ############
@@ -485,12 +485,15 @@ class NinjaAnt(Ant):
     food_cost = 5
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem Optional 1
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
+    blocks_path = False
     # END Problem Optional 1
 
     def action(self, gamestate):
         # BEGIN Problem Optional 1
         "*** YOUR CODE HERE ***"
+        for bee in list(self.place.bees):
+            bee.reduce_health(self.damage)
         # END Problem Optional 1
 
 ############
@@ -503,9 +506,10 @@ class LaserAnt(ThrowerAnt):
 
     name = 'Laser'
     food_cost = 10
+    damage = 2
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem Optional 2
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem Optional 2
 
     def __init__(self, health=1):
@@ -514,12 +518,30 @@ class LaserAnt(ThrowerAnt):
 
     def insects_in_front(self):
         # BEGIN Problem Optional 2
-        return {}
+        dict = {}
+        current_place = self.place
+        distance = 0
+        if current_place.ant.is_container == True and current_place.ant.ant_contained != None:
+            dict[current_place.ant] = distance
+        for bee in current_place.bees:
+                dict[bee] = distance
+        current_place, distance = current_place.entrance, distance + 1
+        while current_place != None and current_place.is_hive == False:
+            if current_place.ant != None :
+                dict[current_place.ant] = distance
+                if current_place.ant.is_container == True and current_place.ant.ant_contained != None:
+                    dict[current_place.ant.ant_contained] = distance
+            for bee in current_place.bees:
+                dict[bee] = distance
+            current_place, distance = current_place.entrance, distance + 1
+        return dict
         # END Problem Optional 2
 
     def calculate_damage(self, distance):
         # BEGIN Problem Optional 2
-        return 0
+        damage = self.damage - distance * 0.25
+        damage -= self.insects_shot * 0.0625
+        return max(0, damage)
         # END Problem Optional 2
 
     def action(self, gamestate):
@@ -555,7 +577,7 @@ class Bee(Insect):
         """Return True if this Bee cannot advance to the next Place."""
         # Special handling for NinjaAnt
         # BEGIN Problem Optional 1
-        return self.place.ant is not None
+        return self.place.ant is not None and self.place.ant.blocks_path
         # END Problem Optional 1
 
     def action(self, gamestate):
